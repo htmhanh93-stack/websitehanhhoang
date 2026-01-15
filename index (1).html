@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phòng Thí Nghiệm Vui Nhộn - Tính Số Mol</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Fredoka', sans-serif;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #e0f7fa 0%, #e1bee7 100%);
+        }
+
+        /* Floating Icons Animation */
+        .floating-icon {
+            position: absolute;
+            opacity: 0.2;
+            z-index: -1;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+
+        .icon-1 { left: 10%; animation-duration: 12s; font-size: 3rem; }
+        .icon-2 { left: 30%; animation-duration: 18s; animation-delay: 2s; font-size: 2rem; }
+        .icon-3 { left: 70%; animation-duration: 15s; animation-delay: 1s; font-size: 4rem; }
+        .icon-4 { left: 90%; animation-duration: 20s; font-size: 2.5rem; }
+        .icon-5 { left: 50%; animation-duration: 25s; animation-delay: 5s; font-size: 3.5rem; }
+
+        /* Custom Scrollbar for dropdown */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c7c7c7;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+        .bubble-btn {
+            transition: all 0.2s ease;
+        }
+        .bubble-btn:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center relative p-4">
+
+    <!-- Background Animations -->
+    <div class="floating-icon icon-1">🧪</div>
+    <div class="floating-icon icon-2">⚛️</div>
+    <div class="floating-icon icon-3">🔬</div>
+    <div class="floating-icon icon-4">⚗️</div>
+    <div class="floating-icon icon-5">🧬</div>
+
+    <!-- Main Container -->
+    <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-2xl w-full max-w-lg border-4 border-white overflow-hidden transform transition-all hover:scale-[1.01]">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-cyan-500 to-blue-500 p-6 text-center text-white relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-full opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+            <h1 class="text-3xl font-bold mb-2 drop-shadow-md">Máy Tính Số Mol 🧪</h1>
+            <p class="text-sm opacity-90">Phòng thí nghiệm bỏ túi của bạn!</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="flex p-2 bg-gray-100/50">
+            <button onclick="switchTab('mass')" id="tab-mass" class="flex-1 py-3 rounded-xl font-bold text-gray-600 transition-all hover:bg-white hover:shadow-sm focus:outline-none ring-2 ring-transparent focus:ring-cyan-300">
+                ⚖️ Từ Khối Lượng
+            </button>
+            <button onclick="switchTab('volume')" id="tab-volume" class="flex-1 py-3 rounded-xl font-bold text-gray-600 transition-all hover:bg-white hover:shadow-sm focus:outline-none ring-2 ring-transparent focus:ring-purple-300">
+                🎈 Từ Thể Tích
+            </button>
+        </div>
+
+        <!-- Content Area -->
+        <div class="p-6 min-h-[400px]">
+            
+            <!-- MASS SECTION -->
+            <div id="content-mass" class="space-y-6">
+                <div class="text-center text-gray-600 mb-4">
+                    <p>Công thức: <span class="font-mono bg-cyan-100 px-2 py-1 rounded text-cyan-800 font-bold">n = m / M</span></p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 ml-1">Chọn chất hoá học:</label>
+                    <div class="relative">
+                        <select id="chemical-select" class="w-full p-4 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-cyan-400 focus:outline-none appearance-none cursor-pointer custom-scrollbar text-gray-700 font-medium transition-colors">
+                            <option value="" disabled selected>🔍 Chọn một chất...</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                        <div class="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none text-gray-400">▼</div>
+                    </div>
+                    <p id="molar-mass-display" class="text-xs text-right mt-1 text-cyan-600 font-bold h-4">Chưa chọn chất</p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 ml-1">Nhập khối lượng (gam):</label>
+                    <input type="number" id="mass-input" placeholder="Ví dụ: 10" class="w-full p-4 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-cyan-400 focus:outline-none font-mono text-lg transition-colors">
+                </div>
+
+                <button onclick="calculateByMass()" class="bubble-btn w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-cyan-200/50 text-xl hover:shadow-cyan-300/50 mt-4">
+                    Tính Số Mol! 🚀
+                </button>
+            </div>
+
+            <!-- VOLUME SECTION -->
+            <div id="content-volume" class="hidden space-y-6">
+                <div class="text-center text-gray-600 mb-4">
+                    <p>Công thức: <span class="font-mono bg-purple-100 px-2 py-1 rounded text-purple-800 font-bold">n = V / ĐKTC</span></p>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 ml-1">Chọn điều kiện tiêu chuẩn:</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="stp-condition" value="24.79" checked class="peer sr-only">
+                            <div class="p-3 rounded-xl border-2 border-gray-200 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition-all text-center">
+                                <div class="font-bold text-gray-700">Mới (25°C, 1bar)</div>
+                                <div class="text-xs text-purple-600">÷ 24.79</div>
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="stp-condition" value="22.4" class="peer sr-only">
+                            <div class="p-3 rounded-xl border-2 border-gray-200 peer-checked:border-purple-500 peer-checked:bg-purple-50 transition-all text-center">
+                                <div class="font-bold text-gray-700">Cũ (0°C, 1atm)</div>
+                                <div class="text-xs text-purple-600">÷ 22.4</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 font-bold mb-2 ml-1">Nhập thể tích khí (Lít):</label>
+                    <input type="number" id="volume-input" placeholder="Ví dụ: 2.479" class="w-full p-4 rounded-xl bg-gray-50 border-2 border-gray-200 focus:border-purple-400 focus:outline-none font-mono text-lg transition-colors">
+                </div>
+
+                <button onclick="calculateByVolume()" class="bubble-btn w-full bg-gradient-to-r from-purple-400 to-pink-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-purple-200/50 text-xl hover:shadow-purple-300/50 mt-4">
+                    Tính Số Mol! 🎈
+                </button>
+            </div>
+
+            <!-- Result Display -->
+            <div id="result-area" class="mt-8 p-4 bg-yellow-50 border-2 border-yellow-200 rounded-xl hidden animate-bounce-short">
+                <h3 class="text-center text-gray-500 font-bold text-sm uppercase tracking-wider mb-1">Kết quả</h3>
+                <div class="text-center">
+                    <span id="result-value" class="text-4xl font-extrabold text-gray-800">0</span>
+                    <span class="text-xl text-gray-600 font-medium ml-1">mol</span>
+                </div>
+                <p id="result-message" class="text-center text-xs text-gray-400 mt-2 italic">Tuyệt vời ông mặt trời!</p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Database of common chemicals
+        const chemicals = [
+            { name: "Hydro (H₂)", m: 2 },
+            { name: "Oxy (O₂)", m: 32 },
+            { name: "Nước (H₂O)", m: 18 },
+            { name: "Khí Carbonic (CO₂)", m: 44 },
+            { name: "Sắt (Fe)", m: 56 },
+            { name: "Đồng (Cu)", m: 64 },
+            { name: "Nhôm (Al)", m: 27 },
+            { name: "Kẽm (Zn)", m: 65 },
+            { name: "Natri Clorua (Muối ăn - NaCl)", m: 58.5 },
+            { name: "Axit Sunfuric (H₂SO₄)", m: 98 },
+            { name: "Axit Clohydric (HCl)", m: 36.5 },
+            { name: "Canxi Cacbonat (Đá vôi - CaCO₃)", m: 100 },
+            { name: "Metan (CH₄)", m: 16 },
+            { name: "Amoniac (NH₃)", m: 17 },
+            { name: "Glucozơ (C₆H₁₂O₆)", m: 180 },
+            { name: "Vàng (Au)", m: 197 },
+            { name: "Bạc (Ag)", m: 108 },
+            { name: "Lưu huỳnh (S)", m: 32 },
+            { name: "Magie (Mg)", m: 24 },
+            { name: "Kali (K)", m: 39 }
+        ];
+
+        // Sort chemicals alphabetically by name for easier searching
+        chemicals.sort((a, b) => a.name.localeCompare(b.name));
+
+        // Populate Select Dropdown
+        const select = document.getElementById('chemical-select');
+        chemicals.forEach(chem => {
+            const option = document.createElement('option');
+            option.value = chem.m;
+            option.textContent = chem.name;
+            select.appendChild(option);
+        });
+
+        // Update Molar Mass Display when changed
+        select.addEventListener('change', function() {
+            const molarMass = this.value;
+            document.getElementById('molar-mass-display').textContent = `M = ${molarMass} g/mol`;
+            // Clear result when changing input
+            hideResult();
+        });
+
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const massTab = document.getElementById('tab-mass');
+            const volumeTab = document.getElementById('tab-volume');
+            const massContent = document.getElementById('content-mass');
+            const volumeContent = document.getElementById('content-volume');
+
+            if (tab === 'mass') {
+                massTab.classList.add('bg-white', 'shadow-md', 'text-cyan-600');
+                volumeTab.classList.remove('bg-white', 'shadow-md', 'text-purple-600');
+                
+                massContent.classList.remove('hidden');
+                volumeContent.classList.add('hidden');
+            } else {
+                volumeTab.classList.add('bg-white', 'shadow-md', 'text-purple-600');
+                massTab.classList.remove('bg-white', 'shadow-md', 'text-cyan-600');
+                
+                volumeContent.classList.remove('hidden');
+                massContent.classList.add('hidden');
+            }
+            hideResult();
+        }
+
+        // Initialize Tabs
+        switchTab('mass');
+
+        // Calculation Logic: Mass
+        function calculateByMass() {
+            const m = parseFloat(document.getElementById('mass-input').value);
+            const M = parseFloat(document.getElementById('chemical-select').value);
+
+            if (isNaN(M)) {
+                alert("Vui lòng chọn một chất hoá học trước nhé! 🧪");
+                return;
+            }
+            if (isNaN(m) || m < 0) {
+                alert("Vui lòng nhập khối lượng hợp lệ (lớn hơn 0)! ⚖️");
+                return;
+            }
+
+            const n = m / M;
+            showResult(n, `Tính từ ${m}g của chất có M=${M}`);
+        }
+
+        // Calculation Logic: Volume
+        function calculateByVolume() {
+            const V = parseFloat(document.getElementById('volume-input').value);
+            // Get selected radio button value
+            const condition = parseFloat(document.querySelector('input[name="stp-condition"]:checked').value);
+
+            if (isNaN(V) || V < 0) {
+                alert("Vui lòng nhập thể tích hợp lệ (lớn hơn 0)! 🎈");
+                return;
+            }
+
+            const n = V / condition;
+            const conditionText = condition === 24.79 ? "25°C, 1bar" : "0°C, 1atm";
+            showResult(n, `Tính từ ${V} lít khí tại ${conditionText}`);
+        }
+
+        // Helper: Show Result
+        function showResult(value, context) {
+            const resultArea = document.getElementById('result-area');
+            const resultValue = document.getElementById('result-value');
+            const resultMessage = document.getElementById('result-message');
+
+            // Format number: show up to 4 decimal places, remove trailing zeros
+            const formatted = parseFloat(value.toFixed(4));
+            
+            resultValue.textContent = formatted;
+            resultMessage.textContent = context;
+            
+            resultArea.classList.remove('hidden');
+            
+            // Re-trigger animation
+            resultArea.classList.remove('animate-bounce-short');
+            void resultArea.offsetWidth; // trigger reflow
+            resultArea.classList.add('animate-bounce-short');
+        }
+
+        function hideResult() {
+            document.getElementById('result-area').classList.add('hidden');
+        }
+
+        // Add custom bounce animation via Tailwind config logic injection style
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes bounce-short {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            .animate-bounce-short {
+                animation: bounce-short 0.5s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+
+    </script>
+</body>
+</html>

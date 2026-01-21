@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CapyChem - Trợ Lý Hóa Học</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #fdf2f8; /* pink-50 */
+        }
+        .capy-shadow {
+            box-shadow: 8px 8px 0px 0px #fbcfe8; /* pink-200 */
+        }
+        .step-box {
+            border-left: 4px solid #f472b6; /* pink-400 */
+        }
+        /* Custom scrollbar for mobile friendliness */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fdf2f8; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #f9a8d4; 
+            border-radius: 4px;
+        }
+        .tab-active {
+            background-color: #fce7f3; /* pink-100 */
+            border-color: #ec4899; /* pink-500 */
+            color: #be185d; /* pink-700 */
+            font-weight: 700;
+        }
+        .tab-inactive {
+            color: #6b7280; /* gray-500 */
+            border-color: transparent;
+        }
+        .tab-inactive:hover {
+            color: #db2777; /* pink-600 */
+            background-color: #fff1f2;
+        }
+        
+        /* Animation for Capybara */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        .capy-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen flex flex-col items-center pb-10">
+
+    <!-- Header -->
+    <header class="w-full bg-white border-b border-pink-100 py-4 px-4 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-3xl mx-auto flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">🧪</div>
+                <h1 class="text-2xl md:text-3xl font-extrabold text-pink-500 tracking-tight">CapyChem</h1>
+            </div>
+            <div class="hidden md:block text-pink-400 font-semibold text-sm">Hóa học thật dễ thương!</div>
+        </div>
+    </header>
+
+    <main class="w-full max-w-3xl px-4 mt-6 flex-grow">
+        
+        <!-- Capybara Assistant Section -->
+        <div class="flex flex-col md:flex-row items-center justify-center mb-8 gap-4 md:gap-8">
+            <!-- Capybara SVG -->
+            <div class="relative w-32 h-32 md:w-40 md:h-40 flex-shrink-0 capy-float">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Body -->
+                    <rect x="40" y="60" width="120" height="90" rx="30" fill="#c29875"/>
+                    <rect x="40" y="60" width="110" height="80" rx="30" fill="#dcb48e"/>
+                    <!-- Head -->
+                    <rect x="110" y="40" width="70" height="60" rx="25" fill="#dcb48e"/>
+                    <!-- Ears -->
+                    <circle cx="125" cy="45" r="10" fill="#c29875"/>
+                    <circle cx="165" cy="45" r="10" fill="#c29875"/>
+                    <!-- Eyes -->
+                    <rect x="135" y="60" width="5" height="10" rx="2" fill="#3e2723"/>
+                    <rect x="160" y="60" width="5" height="10" rx="2" fill="#3e2723"/>
+                    <!-- Nose -->
+                    <rect x="145" y="75" width="10" height="8" rx="3" fill="#3e2723"/>
+                    <rect x="150" y="83" width="1" height="5" fill="#3e2723"/>
+                    <!-- Legs -->
+                    <rect x="50" y="140" width="15" height="20" rx="5" fill="#c29875"/>
+                    <rect x="75" y="140" width="15" height="20" rx="5" fill="#c29875"/>
+                    <rect x="120" y="140" width="15" height="20" rx="5" fill="#c29875"/>
+                    <rect x="145" y="140" width="15" height="20" rx="5" fill="#c29875"/>
+                    <!-- Accessory: Glasses -->
+                    <g id="glasses" class="hidden">
+                        <circle cx="137" cy="65" r="12" stroke="#374151" stroke-width="2"/>
+                        <circle cx="162" cy="65" r="12" stroke="#374151" stroke-width="2"/>
+                        <line x1="149" y1="65" x2="150" y2="65" stroke="#374151" stroke-width="2"/>
+                    </g>
+                    <!-- Accessory: Lab Coat -->
+                    <path d="M40 100 Q40 150 160 150 L160 120 Q160 100 110 100 Z" fill="white" opacity="0.3"/>
+                </svg>
+            </div>
+
+            <!-- Speech Bubble -->
+            <div class="relative bg-white p-5 rounded-2xl shadow-lg border-2 border-pink-200 max-w-sm w-full transition-all duration-300 transform" id="capy-bubble">
+                <div class="absolute top-1/2 -left-3 w-6 h-6 bg-white border-l-2 border-b-2 border-pink-200 transform rotate-45 -translate-y-1/2 md:block hidden"></div>
+                <div class="absolute -bottom-3 left-1/2 w-6 h-6 bg-white border-r-2 border-b-2 border-pink-200 transform rotate-45 -translate-x-1/2 md:hidden block"></div>
+                
+                <h3 class="text-pink-600 font-bold mb-1" id="capy-title">Xin chào! 👋</h3>
+                <p class="text-gray-600 leading-snug" id="capy-text">Mình là Capy. Hãy nhập công thức hóa học để mình giúp bạn tính số mol nhé!</p>
+            </div>
+        </div>
+
+        <!-- Main Interface Card -->
+        <div class="bg-white rounded-3xl overflow-hidden shadow-xl border border-pink-100 mb-10">
+            
+            <!-- Tabs -->
+            <div class="flex overflow-x-auto bg-pink-50 border-b border-pink-100 p-2 gap-2" role="tablist">
+                <button onclick="switchTab('mass')" id="tab-mass" class="tab-active flex-1 py-3 px-4 rounded-xl border transition-all duration-200 whitespace-nowrap text-sm md:text-base text-center">
+                    ⚖️ Từ Khối Lượng
+                </button>
+                <button onclick="switchTab('volume')" id="tab-volume" class="tab-inactive flex-1 py-3 px-4 rounded-xl border transition-all duration-200 whitespace-nowrap text-sm md:text-base text-center">
+                    💨 Từ Thể Tích Khí
+                </button>
+                <button onclick="switchTab('conc')" id="tab-conc" class="tab-inactive flex-1 py-3 px-4 rounded-xl border transition-all duration-200 whitespace-nowrap text-sm md:text-base text-center">
+                    🧪 Từ Dung Dịch
+                </button>
+            </div>
+
+            <!-- Content Area -->
+            <div class="p-6 md:p-8">
+                
+                <!-- SECTION 1: Mass to Moles -->
+                <div id="content-mass" class="block fade-in">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Công thức hóa học</label>
+                            <input type="text" id="mass-formula" placeholder="Ví dụ: NaOH, H2SO4, Ca(NO3)2..." class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors font-mono text-lg" oninput="validateFormula('mass-formula')">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Khối lượng chất (gram)</label>
+                            <input type="number" id="mass-value" placeholder="Nhập số gam..." class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg">
+                        </div>
+                        <button onclick="solveMass()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 transition-all transform active:scale-95 mt-2">
+                            Tính số mol ngay!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Gas Volume to Moles -->
+                <div id="content-volume" class="hidden fade-in">
+                    <div class="bg-blue-50 text-blue-800 p-4 rounded-xl mb-4 text-sm flex items-start gap-2">
+                        <span class="text-xl">ℹ️</span>
+                        <p>Áp dụng cho chất khí ở điều kiện chuẩn hiện hành (25°C, 1 bar). <br> <strong>Công thức: V = n × 24,79</strong></p>
+                    </div>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Thể tích khí (Lít)</label>
+                            <input type="number" id="volume-value" placeholder="Nhập thể tích (L)..." class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg">
+                        </div>
+                        <!-- Optional Formula input just for context/display -->
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Công thức khí (tùy chọn)</label>
+                            <input type="text" id="volume-formula" placeholder="Ví dụ: O2, CO2..." class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors font-mono text-lg">
+                        </div>
+                        <button onclick="solveVolume()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 transition-all transform active:scale-95 mt-2">
+                            Tính số mol ngay!
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: Concentration to Moles -->
+                <div id="content-conc" class="hidden fade-in">
+                    <!-- Toggle Sub-tabs -->
+                    <div class="flex gap-4 mb-4 justify-center">
+                        <label class="flex items-center cursor-pointer gap-2 bg-pink-50 px-3 py-2 rounded-lg border border-pink-100 hover:bg-pink-100">
+                            <input type="radio" name="conc-type" value="cm" checked onchange="toggleConcType()" class="accent-pink-500 w-4 h-4">
+                            <span class="font-semibold text-sm md:text-base">Nồng độ mol (CM)</span>
+                        </label>
+                        <label class="flex items-center cursor-pointer gap-2 bg-pink-50 px-3 py-2 rounded-lg border border-pink-100 hover:bg-pink-100">
+                            <input type="radio" name="conc-type" value="cpercent" onchange="toggleConcType()" class="accent-pink-500 w-4 h-4">
+                            <span class="font-semibold text-sm md:text-base">Nồng độ phần trăm (C%)</span>
+                        </label>
+                    </div>
+
+                    <!-- CM Form -->
+                    <div id="form-cm" class="space-y-4 fade-in">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Nồng độ mol (M hoặc mol/L)</label>
+                            <input type="number" id="cm-value" placeholder="Ví dụ: 0.5" class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Thể tích dung dịch</label>
+                            <div class="flex gap-2">
+                                <input type="number" id="cm-volume" placeholder="Nhập thể tích..." class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg flex-1">
+                                <select id="cm-unit" class="bg-gray-100 border-2 border-gray-200 rounded-xl px-2 font-bold text-gray-600 outline-none">
+                                    <option value="L">Lít (L)</option>
+                                    <option value="mL">mL</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button onclick="solveCM()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 transition-all transform active:scale-95 mt-2">
+                            Tính số mol (n = CM × V)
+                        </button>
+                    </div>
+
+                    <!-- C% Form -->
+                    <div id="form-cpercent" class="space-y-4 hidden fade-in">
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Công thức chất tan</label>
+                            <input type="text" id="cp-formula" placeholder="Ví dụ: NaCl" class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors font-mono text-lg">
+                        </div>
+                         <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Khối lượng dung dịch (gam)</label>
+                            <input type="number" id="cp-mdd" placeholder="Ví dụ: 200" class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 font-bold mb-2 ml-1">Nồng độ phần trăm (%)</label>
+                            <input type="number" id="cp-value" placeholder="Ví dụ: 10" class="w-full bg-gray-50 text-gray-800 border-2 border-gray-200 focus:border-pink-400 rounded-xl px-4 py-3 outline-none transition-colors text-lg">
+                        </div>
+                        <button onclick="solveCPercent()" class="w-full bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 rounded-xl shadow-lg shadow-pink-200 transition-all transform active:scale-95 mt-2">
+                            Tính số mol
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Result Section (Initially Hidden) -->
+        <div id="result-section" class="hidden">
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-pink-200 capy-shadow relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+                    <div class="text-9xl">📝</div>
+                </div>
+
+                <div class="flex items-center justify-between mb-6 border-b border-gray-100 pb-4">
+                    <h2 class="text-2xl font-bold text-gray-800">Lời giải chi tiết</h2>
+                    <button onclick="toggleSteps()" class="text-sm font-semibold text-pink-500 hover:underline">Ẩn/Hiện bước</button>
+                </div>
+
+                <div id="steps-container" class="space-y-6">
+                    <!-- Dynamic Steps will be injected here -->
+                </div>
+
+                <div class="mt-8 bg-green-50 p-4 rounded-xl border border-green-200 flex items-center justify-between">
+                    <div>
+                        <span class="text-green-600 font-bold text-sm uppercase tracking-wide">Kết quả cuối cùng</span>
+                        <div id="final-result" class="text-3xl font-extrabold text-green-700 mt-1">
+                            0.1 mol
+                        </div>
+                    </div>
+                    <div class="text-4xl">🎉</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="mt-8 text-center text-gray-400 text-sm">
+        <p>© 2024 CapyChem. Học hóa không khó, đã có Capy lo!</p>
+        <p class="mt-1 text-xs">Nguyên tử khối: H=1, C=12, N=14, O=16, Na=23, S=32, Cl=35.5, K=39, Ca=40, Fe=56, Cu=64...</p>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- 1. DATA & PARSER ---
+        
+        // Common atomic weights used in Vietnam high school curriculum
+        const atomicWeights = {
+            H: 1, He: 4, Li: 7, Be: 9, B: 11, C: 12, N: 14, O: 16, F: 19, Ne: 20,
+            Na: 23, Mg: 24, Al: 27, Si: 28, P: 31, S: 32, Cl: 35.5, K: 39, Ca: 40,
+            Sc: 45, Ti: 48, V: 51, Cr: 52, Mn: 55, Fe: 56, Co: 59, Ni: 59, Cu: 64,
+            Zn: 65, Ga: 70, Ge: 73, As: 75, Se: 79, Br: 80, Kr: 84, Rb: 85.5, Sr: 88,
+            Ag: 108, Cd: 112, Sn: 119, Sb: 122, I: 127, Ba: 137, Au: 197, Hg: 201, Pb: 207
+        };
+
+        // Function to parse chemical formula
+        function parseFormula(formula) {
+            formula = formula.trim();
+            if (!formula) return null;
+
+            // Stack to handle parentheses
+            // Each stack frame is a map of Element -> Count
+            let stack = [{}]; 
+            
+            const regex = /([A-Z][a-z]?)|(\d+)|(\()|(\))/g;
+            let match;
+            let lastToken = null; // 'elem', 'num', 'close', 'open'
+
+            while ((match = regex.exec(formula)) !== null) {
+                const [token, element, number, open, close] = match;
+
+                if (element) {
+                    // It's an element
+                    if (!atomicWeights[element]) {
+                        throw new Error(`Không tìm thấy nguyên tố: ${element}`);
+                    }
+                    // Add to current top of stack with count 1 (temporary, might change if next token is number)
+                    let currentLayer = stack[stack.length - 1];
+                    currentLayer[element] = (currentLayer[element] || 0) + 1;
+                    lastToken = 'elem';
+                } else if (number) {
+                    const count = parseInt(number);
+                    if (lastToken === 'elem') {
+                        // The number applies to the previous element. 
+                        // We added 1 before, so we add (count - 1) more.
+                        // Actually easier: just find the last added element key? 
+                        // Since objects are unordered, we need to track the last added key is tricky in pure dict.
+                        // Better approach:
+                        // Let's rely on standard logic: Element followed by number.
+                        // We need to know WHICH element was just added.
+                        // Let's cheat a bit: we will scan the regex slightly differently.
+                        // But wait, the standard approach is:
+                        // If number, multiply the count of the last entity processed.
+                        
+                        // Let's restart the loop logic to be safer.
+                    }
+                }
+            }
+            
+            // Re-implementing a safer recursive-like parser using a single pass with clearer state
+            const tokens = [];
+            let r;
+            // Tokenize first
+            const tokenRegex = /([A-Z][a-z]?)|(\d+)|(\()|(\))/g;
+            while ((r = tokenRegex.exec(formula)) !== null) {
+                if (r[1]) tokens.push({type: 'elem', val: r[1]});
+                else if (r[2]) tokens.push({type: 'num', val: parseInt(r[2])});
+                else if (r[3]) tokens.push({type: 'open'});
+                else if (r[4]) tokens.push({type: 'close'});
+            }
+
+            // Process tokens
+            let mainStack = [ {} ]; // Start with base layer
+            
+            for (let i = 0; i < tokens.length; i++) {
+                let t = tokens[i];
+                let current = mainStack[mainStack.length - 1];
+
+                if (t.type === 'elem') {
+                    if (!atomicWeights[t.val]) throw new Error(`Nguyên tố lạ: ${t.val}`);
+                    
+                    // Look ahead for number
+                    let count = 1;
+                    if (i + 1 < tokens.length && tokens[i+1].type === 'num') {
+                        count = tokens[i+1].val;
+                        i++; // Skip next
+                    }
+                    current[t.val] = (current[t.val] || 0) + count;
+
+                } else if (t.type === 'open') {
+                    mainStack.push({}); // New layer
+                } else if (t.type === 'close') {
+                    if (mainStack.length === 1) throw new Error("Thừa dấu ngoặc đóng");
+                    let finishedLayer = mainStack.pop();
+                    
+                    // Look ahead for number after group
+                    let multiplier = 1;
+                    if (i + 1 < tokens.length && tokens[i+1].type === 'num') {
+                        multiplier = tokens[i+1].val;
+                        i++;
+                    }
+
+                    // Merge finished layer into previous layer
+                    let targetLayer = mainStack[mainStack.length - 1];
+                    for (let el in finishedLayer) {
+                        targetLayer[el] = (targetLayer[el] || 0) + (finishedLayer[el] * multiplier);
+                    }
+                }
+            }
+
+            if (mainStack.length > 1) throw new Error("Thiếu dấu ngoặc đóng");
+
+            // Calculate total mass
+            let finalCounts = mainStack[0];
+            let totalM = 0;
+            let breakdown = [];
+
+            for (let el in finalCounts) {
+                let w = atomicWeights[el];
+                let n = finalCounts[el];
+                totalM += w * n;
+                breakdown.push(`${el}: ${w}×${n}`);
+            }
+
+            return {
+                M: totalM,
+                elements: finalCounts,
+                breakdownStr: breakdown.join(" + ")
+            };
+        }
+
+        // --- 2. UI FUNCTIONS ---
+
+        function switchTab(tabId) {
+            // Update buttons
+            ['mass', 'volume', 'conc'].forEach(id => {
+                const btn = document.getElementById(`tab-${id}`);
+                const content = document.getElementById(`content-${id}`);
+                
+                if (id === tabId) {
+                    btn.classList.remove('tab-inactive');
+                    btn.classList.add('tab-active');
+                    content.classList.remove('hidden');
+                    // Small delay for fade-in effect reset
+                    content.classList.remove('fade-in');
+                    void content.offsetWidth; // trigger reflow
+                    content.classList.add('fade-in');
+                } else {
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('tab-inactive');
+                    content.classList.add('hidden');
+                }
+            });
+            hideResult();
+            capySpeak("Chọn chế độ tính toán nhé!", "neutral");
+        }
+
+        function toggleConcType() {
+            const type = document.querySelector('input[name="conc-type"]:checked').value;
+            if (type === 'cm') {
+                document.getElementById('form-cm').classList.remove('hidden');
+                document.getElementById('form-cpercent').classList.add('hidden');
+            } else {
+                document.getElementById('form-cm').classList.add('hidden');
+                document.getElementById('form-cpercent').classList.remove('hidden');
+            }
+            hideResult();
+        }
+
+        function validateFormula(inputId) {
+            // Optional: Real-time validation visual cue
+            // logic can be added here if needed
+        }
+
+        function toggleSteps() {
+            const container = document.getElementById('steps-container');
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+            }
+        }
+
+        function hideResult() {
+            document.getElementById('result-section').classList.add('hidden');
+        }
+
+        function showResult(stepsHtml, finalResultText) {
+            const resSection = document.getElementById('result-section');
+            const stepContainer = document.getElementById('steps-container');
+            const finalResDiv = document.getElementById('final-result');
+            
+            stepContainer.innerHTML = stepsHtml;
+            finalResDiv.textContent = finalResultText;
+            
+            resSection.classList.remove('hidden');
+            resSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // --- 3. CAPYBARA LOGIC ---
+        
+        const randomPhrases = [
+            "Hóa học là phép thuật của cuộc sống! ✨",
+            "Cần cù bù thông minh, nhưng có Capy thì nhanh hơn! 🐹",
+            "Bạn có biết? Nước (H₂O) cũng có khối lượng mol là 18 đó!",
+            "Cố lên! Sắp thành chuyên gia Hóa rồi!",
+            "Đừng quên cân bằng phương trình nhé!",
+            "Mol là cầu nối giữa vi mô và vĩ mô đó! 🌉"
+        ];
+
+        document.querySelector('.capy-float').addEventListener('click', () => {
+            const randomMsg = randomPhrases[Math.floor(Math.random() * randomPhrases.length)];
+            capySpeak(randomMsg, "happy");
+        });
+
+        function capySpeak(text, mood) {
+            const bubble = document.getElementById('capy-bubble');
+            const title = document.getElementById('capy-title');
+            const msg = document.getElementById('capy-text');
+            
+            // Mood handling
+            if (mood === 'error') {
+                title.textContent = "Úi chà! 😿";
+                title.className = "text-red-600 font-bold mb-1";
+                bubble.classList.add('border-red-200');
+                bubble.classList.remove('border-pink-200', 'border-green-200');
+            } else if (mood === 'success') {
+                title.textContent = "Tuyệt vời! 🎉";
+                title.className = "text-green-600 font-bold mb-1";
+                bubble.classList.add('border-green-200');
+                bubble.classList.remove('border-pink-200', 'border-red-200');
+            } else {
+                title.textContent = "Gợi ý 💡";
+                title.className = "text-pink-600 font-bold mb-1";
+                bubble.classList.add('border-pink-200');
+                bubble.classList.remove('border-green-200', 'border-red-200');
+            }
+
+            // Animate text change
+            msg.style.opacity = 0;
+            setTimeout(() => {
+                msg.textContent = text;
+                msg.style.opacity = 1;
+            }, 200);
+        }
+
+        // --- 4. SOLVERS ---
+
+        function formatNumber(num) {
+            return parseFloat(num.toFixed(4)).toString(); // Remove trailing zeros
+        }
+
+        function createStep(num, title, content) {
+            return `
+                <div class="step-box pl-4 py-1">
+                    <div class="text-xs font-bold text-pink-400 uppercase tracking-wider mb-1">Bước ${num}</div>
+                    <div class="font-bold text-gray-800 mb-1">${title}</div>
+                    <div class="text-gray-600 font-mono bg-gray-50 p-2 rounded border border-gray-100">${content}</div>
+                </div>
+            `;
+        }
+
+        function solveMass() {
+            const formulaStr = document.getElementById('mass-formula').value;
+            const m = parseFloat(document.getElementById('mass-value').value);
+
+            if (!formulaStr || isNaN(m)) {
+                capySpeak("Bạn nhớ nhập đủ công thức và khối lượng nhé!", "error");
+                return;
+            }
+
+            try {
+                const data = parseFormula(formulaStr);
+                const n = m / data.M;
+
+                let steps = "";
+                
+                // Step 1: Molar Mass
+                steps += createStep(1, "Tính khối lượng mol (M)", 
+                    `${formulaStr} = ${data.breakdownStr} = <strong>${data.M} g/mol</strong>`
+                );
+
+                // Step 2: Formula
+                steps += createStep(2, "Áp dụng công thức", "n = m / M");
+
+                // Step 3: Calculate
+                steps += createStep(3, "Thay số và tính toán", 
+                    `n = ${m} / ${data.M} = <strong>${formatNumber(n)} mol</strong>`
+                );
+
+                showResult(steps, `${formatNumber(n)} mol`);
+                capySpeak(`M(${formulaStr}) là ${data.M} g/mol. Kết quả là ${formatNumber(n)} mol nhé!`, "success");
+
+            } catch (e) {
+                capySpeak("Công thức hóa học có vẻ chưa đúng. Kiểm tra lại nhé!", "error");
+                console.error(e);
+            }
+        }
+
+        function solveVolume() {
+            const v = parseFloat(document.getElementById('volume-value').value);
+            const formulaStr = document.getElementById('volume-formula').value; // Optional
+
+            if (isNaN(v)) {
+                capySpeak("Đừng quên nhập thể tích khí nha!", "error");
+                return;
+            }
+
+            const n = v / 24.79;
+
+            let steps = "";
+            let context = formulaStr ? `của khí ${formulaStr}` : "khí";
+
+            steps += createStep(1, "Xác định dữ kiện", 
+                `V = ${v} L (điều kiện chuẩn 25°C, 1 bar)`
+            );
+
+            steps += createStep(2, "Áp dụng công thức", "n = V / 24,79");
+
+            steps += createStep(3, "Thay số và tính toán", 
+                `n = ${v} / 24,79 = <strong>${formatNumber(n)} mol</strong>`
+            );
+
+            showResult(steps, `${formatNumber(n)} mol`);
+            capySpeak(`Ở điều kiện chuẩn, 1 mol khí chiếm 24,79 Lít đó!`, "success");
+        }
+
+        function solveCM() {
+            const cm = parseFloat(document.getElementById('cm-value').value);
+            let v = parseFloat(document.getElementById('cm-volume').value);
+            const unit = document.getElementById('cm-unit').value;
+
+            if (isNaN(cm) || isNaN(v)) {
+                capySpeak("Nhập đủ Nồng độ và Thể tích giúp mình nhé!", "error");
+                return;
+            }
+
+            let steps = "";
+            
+            // Convert Volume if needed
+            let v_lit = v;
+            if (unit === 'mL') {
+                v_lit = v / 1000;
+                steps += createStep(1, "Đổi đơn vị thể tích ra Lít", 
+                    `${v} mL = ${v}/1000 = ${v_lit} L`
+                );
+            } else {
+                steps += createStep(1, "Xác định dữ kiện", 
+                    `CM = ${cm} M, V = ${v} L`
+                );
+            }
+
+            const n = cm * v_lit;
+
+            steps += createStep(unit === 'mL' ? 2 : 2, "Áp dụng công thức", "n = CM × V");
+
+            steps += createStep(unit === 'mL' ? 3 : 3, "Thay số và tính toán", 
+                `n = ${cm} × ${v_lit} = <strong>${formatNumber(n)} mol</strong>`
+            );
+
+            showResult(steps, `${formatNumber(n)} mol`);
+            capySpeak(`Dễ ợt! Cứ nhân nồng độ với thể tích (Lít) là ra.`, "success");
+        }
+
+        function solveCPercent() {
+            const formulaStr = document.getElementById('cp-formula').value;
+            const mdd = parseFloat(document.getElementById('cp-mdd').value);
+            const c = parseFloat(document.getElementById('cp-value').value);
+
+            if (!formulaStr || isNaN(mdd) || isNaN(c)) {
+                capySpeak("Nhập đủ Công thức, Khối lượng dd và C% nha!", "error");
+                return;
+            }
+
+            try {
+                const data = parseFormula(formulaStr);
+                
+                // 1. Calculate mass of solute (m_ct)
+                const m_ct = (c * mdd) / 100;
+                
+                // 2. Calculate moles
+                const n = m_ct / data.M;
+
+                let steps = "";
+
+                steps += createStep(1, "Tính khối lượng chất tan (m_ct)", 
+                    `m_ct = (C% × m_dd) / 100 <br>
+                     m_ct = (${c} × ${mdd}) / 100 = <strong>${formatNumber(m_ct)} g</strong>`
+                );
+
+                steps += createStep(2, "Tính khối lượng mol (M)", 
+                    `M(${formulaStr}) = ${data.breakdownStr} = <strong>${data.M} g/mol</strong>`
+                );
+
+                steps += createStep(3, "Tính số mol (n)", 
+                    `n = m_ct / M = ${formatNumber(m_ct)} / ${data.M} = <strong>${formatNumber(n)} mol</strong>`
+                );
+
+                showResult(steps, `${formatNumber(n)} mol`);
+                capySpeak(`Bài này phải tính qua 2 bước, nhưng bạn làm tốt lắm!`, "success");
+
+            } catch (e) {
+                capySpeak("Kiểm tra lại công thức hóa học nhé!", "error");
+            }
+        }
+
+    </script>
+</body>
+</html>
